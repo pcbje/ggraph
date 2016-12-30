@@ -11,4 +11,4 @@ script:
   - "/opt/node_modules/.bin/karma start tests/cover.conf.js"
 
 after_success:
-  - "coveralls coverage/lcov.info"
+  - "coveralls-lcov coverage/lcov.info"
