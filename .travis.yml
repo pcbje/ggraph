@@ -4,8 +4,7 @@ dist: trusty
 language: node_js
 
 install:
-  - "sudo apt-get install --force-yes -y rubygems-integration"
-  - "sudo gem install coveralls-lcov"
+  - "pip install coveralls"
   - "cp package.json /opt && npm install --prefix=/opt /opt"
 
 script:
