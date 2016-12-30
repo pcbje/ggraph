@@ -4,11 +4,11 @@ dist: trusty
 language: node_js
 
 install:
-  - "pip install coveralls"
+  - gem install coveralls-lcov
   - "cp package.json /opt && npm install --prefix=/opt /opt"
 
 script:
   - "/opt/node_modules/.bin/karma start tests/cover.conf.js"
 
 after_success:
-  - "coveralls"
+  - "coveralls coverage/lcov.info"
