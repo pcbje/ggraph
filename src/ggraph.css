@@ -1,0 +1,143 @@
+body {
+  background-color: #F4F5F4;
+}
+
+svg[name=filtered] .links line {
+  stroke: #888;
+}
+
+.links line {
+  stroke: #aaa;
+  stroke-opacity: 1;
+}
+
+text.label,
+rect.text-background,
+rect.text-background-background {
+  display: none;
+}
+
+g.visible text.label {
+  display: block;
+  font-family: verdana;
+  font-size: 10px;
+}
+
+g.visible rect.text-background {
+  opacity: 0.25;
+}
+
+g.visible rect.text-background-background,
+g.visible rect.text-background {
+  z-index: 999;
+  display: block;
+  fill-opacity: 1;
+  stroke-width: 0.5;
+}
+
+path {
+  stroke: #fff;
+  stroke-opacity: 0.5;
+  stroke-width: 0.5;
+}
+
+g[name=composite] g.visible text.label {
+
+}
+
+g[name=composite] g.visible rect.text-background {
+
+}
+
+g.membernode[name=selected] circle {
+  /*fill: red;*/
+}
+
+svg[name=filtered] circle[name=group-foreground]  {
+  opacity: 0.3;
+}
+
+g.membernode[name=contact] circle {
+  opacity: 1;
+}
+
+g.membernode circle {
+  stroke: #F4F5F4;
+  stroke-width: 0.5px;
+}
+
+g[name=composite] g.membernode circle {
+  stroke: #777;
+}
+
+g.membernode circle:hover {
+    stroke: red;
+}
+
+svg[name=filtered] g.membernode circle,
+svg[name=filtered] g.membernode path {
+  opacity: 0.3;
+}
+
+svg[name=filtered] g.membernode circle[name=selected],
+svg[name=filtered] g.membernode circle[name=contact],
+svg[name=filtered] g.membernode path[name=selected],
+svg[name=filtered] g.membernode path[name=contact] {
+  opacity: 1;
+}
+
+svg[name=filtered] g.membernode circle.member-background {
+  fill: #F4F5F4;
+  opacity: 1;
+}
+
+svg[name=filtered] line.rel {
+  opacity: 0.3;
+}
+
+g[name=backbone] line.rel[name="filtered"] {
+  stroke: #ddd;
+
+}
+
+.labels polyline {
+  display: none;
+}
+
+.labels polyline.visible {
+  fill: none;
+  display: block;
+  stroke: blue;
+  stroke-width: 1;
+  z-index: 1;
+   stroke-dasharray: 2;
+}
+
+line.selected {
+  stroke: red;
+  stroke-width: 1;
+  stroke-dasharray: 2;
+}
+
+svg {
+  fill: #fff;
+}
+rect#background {
+  fill: #fff;
+}
+
+text {
+  fill: #000;
+}
+
+.polygon {
+  fill:green;
+  fill-opacity:0.15;
+  stroke-width: 1px;
+  stroke: green;
+  stroke-opacity: 0.4;
+}
+
+circle[name=group-background] {
+  fill: #F4F5F4;
+}

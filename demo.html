@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      body,html,svg, #container {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        font-family: verdana;
+      }
+
+      #controls {
+        position:absolute;
+        top:0;
+        left:0px;
+        padding:4px;
+        border-bottom: 1px solid #ccc;
+        width:100%;
+        font-size: 0.7em;
+      }
+
+      #controls input {
+        font-size:14px
+      }
+
+      #controls input[type="button"],
+      #controls input[type="submit"] {
+        font-size:18px
+      }
+    </style>
+    <link rel="stylesheet" href="src/ggraph.css" />
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="src/marker/marker.js"></script>
+
+    <script src="ext/simmelian.js"></script>
+    <script src="ext/singles.js"></script>
+
+    <script src="src/algorithms/ladjust.js"></script>
+    <script src="src/algorithms/makecluster.js"></script>
+
+    <script src="src/modules/labels.js"></script>
+    <script src="src/modules/groups.js"></script>
+    <script src="src/modules/nodes.js"></script>
+    <script src="src/modules/selection.js"></script>
+
+    <script src="src/modules/member_lines.js"></script>
+
+    <script src="src/modify/merger.js"></script>
+    <script src="src/modify/splitter.js"></script>
+    <script src="src/modify/remover.js"></script>
+
+    <script src="src/ggraph.js"></script>
+    <title>ggraph demo</title>
+  </head>
+  <body>
+    <div id="controls">
+      <input type="button" value="Merge" onclick="merge()" />
+      <input type="button" value="Split" onclick="split()" />
+      <input type="button" value="Remove" onclick="remove()" />
+      | <input type="button" value="Group singles" onclick="_singles()" />
+      <input type="button" value="Backbone" onclick="_backbones()" />
+      |
+      Nodes: <span id="node-count">0</span>
+      Edges: <span id="edge-count">0</span>
+    </div>
+    <div id="container"></div>
+  </body>
+  <script>
+    var all;
+    var selected;
+    var graph;
+    var converted;
+    var type = null;
+
+    ggraph.init('container');
+
+    var merge = function() {
+      ggraph.merge(selection.all());
+    }
+
+    var remove = function() {
+      var s = [];
+      for (var k in selected) {
+        s.push({id: k})
+      }
+      ggraph.remove(s);
+    }
+
+    var split = function() {
+      ggraph.split(all);
+    }
+
+    function _singles(e) {
+      var groups = singles.get_groups(converted);
+      all = groups;
+      ggraph.merge(groups);
+    };
+
+    function _backbones(e) {
+      var res = simmelian.filter(converted.all_links, 0.75);
+      ggraph.filter_links(res);
+    };
+
+    ggraph.on_select(function(_all, _selected) {
+      all = selection.all();
+      selected = selection.selected();
+    });
+
+    var graph = {
+      nodes:[
+        {id: "Maria West", type: "female"},
+        {id: "Hazel Santiago", type: "male"},
+        {id: "Sheldon Roy", type: "male"},
+        {id: "Tracey Martinez", type: "female"},
+        {id: "Warren Mcgee", type: "male"},
+        {id: "Donnie Ballard", type: "female"},
+        {id: "Jackie Snyder", type: "female"},
+        {id: "Robin Luna", type: "male"},
+        {id: "Verna Bailey", type: "female"},
+        {id: "Donni Ballard", type: "female"},
+        {id: "Paal Hansen", type: "male"},
+        {id: "Shane	Simpson", type: "male"},
+        {id: "Robyn Luna", type: "male"},
+        {id: "Penny	Marsh", type: "female"},
+      ],
+      links: [
+        {source: "Maria West", target: "Hazel Santiago", value:100},
+        {source: "Maria West", target: "Sheldon Roy"},
+        {source: "Hazel Santiago", target: "Sheldon Roy"},
+        {source: "Maria West", target: "Tracey Martinez"},
+        {source: "Maria West", target: "Warren Mcgee"},
+        {source: "Hazel Santiago", target: "Tracey Martinez"},
+        {source: "Hazel Santiago", target: "Warren Mcgee"},
+        {source: "Sheldon Roy", target: "Tracey Martinez"},
+        {source: "Sheldon Roy", target: "Warren Mcgee"},
+        {source: "Tracey Martinez", target: "Warren Mcgee"},
+        {source: "Sheldon Roy", target: "Donnie Ballard"},
+        {source: "Donnie Ballard", target: "Jackie Snyder"},
+        {source: "Donnie Ballard", target: "Robin Luna"},
+        {source: "Jackie Snyder", target: "Robin Luna"},
+        {source: "Robin Luna", target: "Verna Bailey"},
+        {source: "Donni Ballard", target: "Verna Bailey"},
+        {source: "Maria West", target: "Verna Bailey"},
+        {source: "Paal Hansen", target: "Verna Bailey"},
+
+        {source: "Shane	Simpson", target: "Robyn Luna"},
+        {source: "Shane	Simpson", target: "Penny	Marsh"},
+        {source: "Penny	Marsh", target: "Robyn Luna"}
+      ]
+    }
+
+    document.getElementById('node-count').innerHTML = graph.nodes.length;
+    document.getElementById('edge-count').innerHTML = graph.links.length;
+
+    converted = ggraph.convert(graph);
+
+    ggraph.draw(converted);
+  </script>
+</html>
