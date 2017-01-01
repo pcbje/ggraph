@@ -20,6 +20,13 @@ var ggraph = (function() {
   var height;
   var root;
 
+  var zoom = function () {
+    all.attr("transform", d3.event.transform)
+    transform.current = d3.event.transform;
+  };
+
+  var zoomer = d3.zoom().on('zoom', zoom);
+
   var select = function(hide_labels) {
     var all_nodes = selection.all();
     var selected_nodes = selection.selected();
@@ -117,10 +124,7 @@ var ggraph = (function() {
 
     transform = {current: {k: 1, x: 0, y: 0}};
 
-    svg = d3.select(root).append('svg').call(d3.zoom().on("zoom", function () {
-      all.attr("transform", d3.event.transform)
-      transform.current = d3.event.transform;
-    }));
+    svg = d3.select(root).append('svg');
 
     background = svg.append('g').append('rect').attr('width', element.width).attr('height', element.height)
       .attr('x', 0).attr('y', 0).attr('id', 'background').on('click', function() {
@@ -401,6 +405,24 @@ var ggraph = (function() {
     graph = _graph;
   }
 
+  var set_mode = function(mode) {
+    if (mode === 'select') {
+      marker.state.select = true;
+      zoomer.on('zoom', null);
+      svg.call(zoomer)
+      .on("mousedown.zoom", null)
+      .on("touchstart.zoom", null)
+      .on("touchmove.zoom", null)
+      .on("touchend.zoom", null);
+    }
+    else {
+      marker.state.select = false;
+      zoomer.on('zoom', zoom);
+      svg.call(zoomer);
+    }
+
+  }
+
   return {
     init: init,
     draw: _draw,
@@ -414,6 +436,7 @@ var ggraph = (function() {
     ticked: ticked,
     clear_selected: clear_selected,
     cluster: cluster,
-    filter_links: filter_links
+    filter_links: filter_links,
+    set_mode: set_mode
   }
 })();

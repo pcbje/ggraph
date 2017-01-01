@@ -11,6 +11,7 @@ describe("marker", function() {
     index = 0;
 
     marker.init(container, background, transform);
+    marker.state.select = true;
   })
 
   var draw = function(path) {
@@ -23,12 +24,21 @@ describe("marker", function() {
     }
 
     expect(marker.state.started).toEqual(false);
-    background.dispatch('contextmenu')
+    background.dispatch('mousedown')
     expect(marker.state.started).toEqual(true);
     for (var i=0; i<path.length; i++) {
       background.dispatch('mousemove')
     }
   }
+
+  it("should not draw if not select", function() {
+    marker.state.select = false;
+
+    background.dispatch('mousedown')
+    background.dispatch('mousemove')
+
+    expect(marker.points).toEqual([])
+  });
 
   it("should draw", function() {
     var path = [[0, 0], [50, 0], [50, 50], [0, 50], [0, 0]]

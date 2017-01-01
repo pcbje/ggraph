@@ -56,6 +56,10 @@
   </head>
   <body>
     <div id="controls">
+      <input type="radio" name="mode" value="select" checked="checked" id="mode-select" onclick="ggraph.set_mode('select')"> <label for="mode-select">Select</label>
+      &nbsp;
+      <input type="radio" name="mode" value="drag" id="mode-drag" onclick="ggraph.set_mode('drag')"> <label for="mode-drag">Drag</label>
+      |
       <input type="button" value="Merge" onclick="merge()" />
       <input type="button" value="Split" onclick="split()" />
       <input type="button" value="Remove" onclick="remove()" />
