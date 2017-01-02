@@ -111,11 +111,10 @@ var marker = (function() {
     background.on('mouseup', up);
 
     background.on('mousemove', function() {
-      if (!state.started) return;      
-      var pos = marker.get_mouse_pos()
+      if (!state.started) return;
+      var pos = marker.get_mouse_pos();
       var x = Math.max(0, Math.min(width, (pos.x - transform.current.x) / transform.current.k));
       var y = Math.max(0, Math.min(height, (pos.y - transform.current.y) / transform.current.k));
-      console.log(x, y)
       marker.points.push([x, y])
       poly.attr('points', to_str(marker.points, 4, true));
       call();

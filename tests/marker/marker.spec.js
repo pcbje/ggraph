@@ -10,7 +10,7 @@ describe("marker", function() {
     transform = {current: {k: 1, x: 0, y: 0}};
     index = 0;
 
-    marker.init(container, background, transform);
+    marker.init(container, background, transform, 0, 0, 100, 100);
     marker.state.select = true;
   })
 
