@@ -27,15 +27,15 @@ var ggraph = (function() {
 
   var zoomer = d3.zoom().on('zoom', zoom);
 
-  var select = function(hide_labels) {
-    var all_nodes = selection.all();
+  var timeout_select = function(hide_labels) {
+    var all_selected_nodes = selection.all();
     var selected_nodes = selection.selected();
 
-    d3.select('svg').attr('name', all_nodes.length > 0 ? 'filtered' : '');
+    d3.select('svg').attr('name', all_selected_nodes.length > 0 ? 'filtered' : '');
     d3.selectAll('.member').attr('name', 'default');
     d3.selectAll('.visible').attr('class', '');
 
-    if (all_nodes.length > 0) simulation.stop();
+    if (all_selected_nodes.length > 0) simulation.stop();
 
     var labels = [];
     var circles = [];
@@ -43,10 +43,10 @@ var ggraph = (function() {
 
     var from_x, from_y, to_x, to_y;
 
-    all_nodes.map(function(member) {
+    all_selected_nodes.map(function(member) {
       member.circle.attr('name', selected_nodes && member.id in selected_nodes ? 'selected' : 'contact');
       member = graph.member_map[member.id];
-      if (!hide_labels && selection.size() < 100) {
+      if (!hide_labels && all_selected_nodes.length < 100) {
         var group = graph.nodes[graph.group_map[member.group]];
         if (!(member.group in node_cache)) {
           node_cache[member.group] = {
@@ -87,6 +87,19 @@ var ggraph = (function() {
 
       member.label.move(from_x, from_y, to_x, to_y);
     });
+  }
+
+  var select_timeout;
+  var select = function(hide_labels, timeout) {
+    if (!timeout) {
+      timeout_select(hide_labels);
+    }
+    else {
+      clearTimeout(select_timeout);
+      select_timeout = setTimeout(function() {
+        timeout_select(hide_labels);
+      }, 50);
+    }
   }
 
   var clear_selected = function() {
