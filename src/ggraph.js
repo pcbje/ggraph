@@ -123,7 +123,7 @@ var ggraph = (function() {
         .attr("y2", function(d) { return d.target.y; });
   }
 
-  var init = function(_root) {
+  var init = function(_root, timeout) {
     root = _root;
     if (root.constructor === String) {
       root = document.getElementById(root)
@@ -159,8 +159,8 @@ var ggraph = (function() {
       .force("link", d3.forceLink().id(function(d) { return d.id; }).strength(link_strength))
         //.distance(100);
 
-    callbacks.push(function(all, selected) {
-      select(all, selected);
+    callbacks.push(function() {
+      select(false, timeout);
     });
 
     selection.listen(function() {
@@ -178,7 +178,7 @@ var ggraph = (function() {
 
     member_lines.init(background_lines_container);
 
-    marker.init(draw, svg, transform, element.left * -1, element.top * -1, element.width, element.height);
+    marker.init(draw, svg, transform, element.left * -1, element.top * -1);
 
     marker.marked(function(clear) {
       simulation.stop();

@@ -42,7 +42,7 @@ converted = ggraph.convert(graph);
 Initialization:
 
 ```javascript
-ggraph.init('container');
+ggraph.init('container', 25); // Marker timeout
 ggraph.draw(converted);
 ```
 
