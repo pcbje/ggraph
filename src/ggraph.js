@@ -126,7 +126,10 @@ var ggraph = (function() {
 
     svg = d3.select(root).append('svg');
 
-    background = svg.append('g').append('rect').attr('width', element.width).attr('height', element.height)
+    // Make sure nothing is selected when using marker.
+    svg.attr('style', '-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;')
+
+    background = svg.append('g').append('rect').attr('width', width).attr('height', height)
       .attr('x', 0).attr('y', 0).attr('id', 'background').on('click', function() {
         clear_selected();
     });
@@ -162,7 +165,7 @@ var ggraph = (function() {
 
     member_lines.init(background_lines_container);
 
-    marker.init(draw, svg, transform, element.left * -1, element.top * -1);
+    marker.init(draw, svg, transform, element.left * -1, element.top * -1, element.width, element.height);
 
     marker.marked(function(clear) {
       simulation.stop();

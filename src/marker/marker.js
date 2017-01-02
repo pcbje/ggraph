@@ -87,7 +87,7 @@ var marker = (function() {
     }
   }
 
-  var init = function(container, background, _transform, _offset_x, _offset_y) {
+  var init = function(container, background, _transform, _offset_x, _offset_y, width, height) {
     poly = container.append('polygon').attr('class', 'polygon')
     transform = _transform;
     offset_x = _offset_x;
@@ -108,13 +108,14 @@ var marker = (function() {
     }
 
     document.addEventListener('mouseup', up);
-    background.on('mouseup', up);    
+    background.on('mouseup', up);
 
     background.on('mousemove', function() {
-      if (!state.started) return;
+      if (!state.started) return;      
       var pos = marker.get_mouse_pos()
-      var x = (pos.x - transform.current.x) / transform.current.k;
-      var y = (pos.y - transform.current.y) / transform.current.k;
+      var x = Math.max(0, Math.min(width, (pos.x - transform.current.x) / transform.current.k));
+      var y = Math.max(0, Math.min(height, (pos.y - transform.current.y) / transform.current.k));
+      console.log(x, y)
       marker.points.push([x, y])
       poly.attr('points', to_str(marker.points, 4, true));
       call();
