@@ -218,7 +218,7 @@ var ggraph = (function() {
 
   var link_strength = function(d) {
     if (d.filtered) return 0.01  / (d.source.members.length * d.target.members.length);
-    if (d.source.members[0] && d.source.members[0].type === 'comment') return 1 / d.source.members[0].id.length;
+    if (d.source.members && d.source.members[0] && d.source.members[0].type === 'comment') return 1 / d.source.members[0].id.length;
     return 1 / (d.source.members.length + d.target.members.length);
   };
 
@@ -271,7 +271,7 @@ var ggraph = (function() {
 
     link = container.append("g")
       .attr("class", "links").selectAll("line").data(graph.links).enter().append("line").attr('class', 'rel').attr("stroke-width", function(d, e) {
-        if (d.source.members && d.source.members[0].type === 'comment') {
+        if (d.source.members && d.source.members[0] && d.source.members[0].type === 'comment') {
             d3.select(this).attr('type', 'comment');
         }
         else if(graph.member_map[d.source] && graph.member_map[d.source].type === 'comment') {
