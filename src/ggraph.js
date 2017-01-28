@@ -129,7 +129,6 @@ var ggraph = (function() {
       root = document.getElementById(root)
     }
     root.innerHTML = '';
-    root.addEventListener('contextmenu', function(e) {e.preventDefault()});
 
     var element = root.getBoundingClientRect();
     width = element.width;
