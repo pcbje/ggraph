@@ -216,15 +216,19 @@ var ggraph = (function() {
     return 1 / (d.source.members.length + d.target.members.length);
   };
 
+  var drag_start = function(d) {
+    started = true;
+    selection.clear();
+    clear_selected();
+    if (d3.event && !d3.event.active) {
+      simulation.alphaTarget(0.3).restart();
+    }
+    d.fx = d.x;
+    d.fy = d.y;
+  }
+
   var drag = d3.drag()
-    .on("start", function(d) {
-      started = true;
-      if (!d3.event.active) {
-        simulation.alphaTarget(0.3).restart();
-      }
-      d.fx = d.x;
-      d.fy = d.y;
-    })
+    .on("start", drag_start)
     .on("drag", function(d) {
       member_lines.clear();
       started = true;
@@ -453,6 +457,9 @@ var ggraph = (function() {
     clear_selected: clear_selected,
     cluster: cluster,
     filter_links: filter_links,
-    set_mode: set_mode
+    set_mode: set_mode,
+    drag: {
+      start: drag_start
+    }
   }
 })();

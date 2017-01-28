@@ -157,6 +157,16 @@ describe("ggraph", function() {
     expect(selected).toEqual(2);
   });
 
+  it('removes mark on drag', function() {
+    marker.set([[0,0],[0,3],[3,3],[3,0]]);
+    selected = d3.select(container).selectAll('circle[name=selected]').size();
+    expect(selected).toEqual(2);
+    // drag
+    ggraph.drag.start({});
+    selected = d3.select(container).selectAll('circle[name=selected]').size();
+    expect(selected).toEqual(0);
+  });
+
   it('cluster', function() {
     var clusters = ggraph.cluster([
       {source: {id: 'a'}, target: {id: 'b'}},
