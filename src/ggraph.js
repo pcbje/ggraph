@@ -20,15 +20,22 @@ var ggraph = (function() {
   var height;
   var root;
 
-  var select = function(hide_labels) {
-    var all_nodes = selection.all();
+  var zoom = function () {
+    all.attr("transform", d3.event.transform)
+    transform.current = d3.event.transform;
+  };
+
+  var zoomer = d3.zoom().on('zoom', zoom);
+
+  var timeout_select = function(hide_labels) {
+    var all_selected_nodes = selection.all();
     var selected_nodes = selection.selected();
 
-    d3.select('svg').attr('name', all_nodes.length > 0 ? 'filtered' : '');
+    d3.select('svg').attr('name', all_selected_nodes.length > 0 ? 'filtered' : '');
     d3.selectAll('.member').attr('name', 'default');
     d3.selectAll('.visible').attr('class', '');
 
-    if (all_nodes.length > 0) simulation.stop();
+    if (all_selected_nodes.length > 0) simulation.stop();
 
     var labels = [];
     var circles = [];
@@ -36,10 +43,10 @@ var ggraph = (function() {
 
     var from_x, from_y, to_x, to_y;
 
-    all_nodes.map(function(member) {
+    all_selected_nodes.map(function(member) {
       member.circle.attr('name', selected_nodes && member.id in selected_nodes ? 'selected' : 'contact');
       member = graph.member_map[member.id];
-      if (!hide_labels && selection.size() < 100) {
+      if (!hide_labels && all_selected_nodes.length < 100) {
         var group = graph.nodes[graph.group_map[member.group]];
         if (!(member.group in node_cache)) {
           node_cache[member.group] = {
@@ -82,6 +89,19 @@ var ggraph = (function() {
     });
   }
 
+  var select_timeout;
+  var select = function(hide_labels, timeout) {
+    if (!timeout) {
+      timeout_select(hide_labels);
+    }
+    else {
+      clearTimeout(select_timeout);
+      select_timeout = setTimeout(function() {
+        timeout_select(hide_labels);
+      }, 50);
+    }
+  }
+
   var clear_selected = function() {
     d3.select(root).selectAll('circle.member').attr('name', 'default');
     member_lines.clear();
@@ -103,7 +123,7 @@ var ggraph = (function() {
         .attr("y2", function(d) { return d.target.y; });
   }
 
-  var init = function(_root) {
+  var init = function(_root, timeout) {
     root = _root;
     if (root.constructor === String) {
       root = document.getElementById(root)
@@ -117,12 +137,12 @@ var ggraph = (function() {
 
     transform = {current: {k: 1, x: 0, y: 0}};
 
-    svg = d3.select(root).append('svg').call(d3.zoom().on("zoom", function () {
-      all.attr("transform", d3.event.transform)
-      transform.current = d3.event.transform;
-    }));
+    svg = d3.select(root).append('svg');
 
-    background = svg.append('g').append('rect').attr('width', element.width).attr('height', element.height)
+    // Make sure nothing is selected when using marker.
+    svg.attr('style', '-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;')
+
+    background = svg.append('g').append('rect').attr('width', width).attr('height', height)
       .attr('x', 0).attr('y', 0).attr('id', 'background').on('click', function() {
         clear_selected();
     });
@@ -139,8 +159,8 @@ var ggraph = (function() {
       .force("link", d3.forceLink().id(function(d) { return d.id; }).strength(link_strength))
         //.distance(100);
 
-    callbacks.push(function(all, selected) {
-      select(all, selected);
+    callbacks.push(function() {
+      select(false, timeout);
     });
 
     selection.listen(function() {
@@ -401,6 +421,24 @@ var ggraph = (function() {
     graph = _graph;
   }
 
+  var set_mode = function(mode) {
+    if (mode === 'select') {
+      marker.state.select = true;
+      zoomer.on('zoom', null);
+      svg.call(zoomer)
+      .on("mousedown.zoom", null)
+      .on("touchstart.zoom", null)
+      .on("touchmove.zoom", null)
+      .on("touchend.zoom", null);
+    }
+    else {
+      marker.state.select = false;
+      zoomer.on('zoom', zoom);
+      svg.call(zoomer);
+    }
+
+  }
+
   return {
     init: init,
     draw: _draw,
@@ -414,6 +452,7 @@ var ggraph = (function() {
     ticked: ticked,
     clear_selected: clear_selected,
     cluster: cluster,
-    filter_links: filter_links
+    filter_links: filter_links,
+    set_mode: set_mode
   }
 })();

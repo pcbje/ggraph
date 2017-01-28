@@ -4,7 +4,8 @@ var marker = (function() {
   var max_radius = 0;
   var selected = {};
   var callbacks = [];
-  var state = {started: false}
+  var state = {select: true, started: false}
+
 
   // https://github.com/Jam3/chaikin-smooth
   var smooth = function(input, output) {
@@ -94,20 +95,24 @@ var marker = (function() {
     state.started = false;
     marker.points = [];
 
-    background.on('contextmenu', function() {
+    background.on('mousedown', function() {
+      if (!state.select) return;
       call(!d3.event.shiftKey);
       state.started = true;
     });
 
-    document.addEventListener('mouseup', function() {
+    var up = function() {
       state.started = false;
       marker.points = [];
       poly.attr('points', to_str(marker.points, 4, true));
-    });
+    }
+
+    document.addEventListener('mouseup', up);
+    background.on('mouseup', up);
 
     background.on('mousemove', function() {
       if (!state.started) return;
-      var pos = marker.get_mouse_pos()
+      var pos = marker.get_mouse_pos();
       var x = (pos.x - transform.current.x) / transform.current.k;
       var y = (pos.y - transform.current.y) / transform.current.k;
       marker.points.push([x, y])

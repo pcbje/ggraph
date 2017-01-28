@@ -3,12 +3,15 @@
   <head>
     <meta charset="utf-8">
     <style>
-      body,html,svg, #container {
+      body,html, svg, #container {
         margin: 0;
         padding: 0;
         width: 100%;
         height: 100%;
         font-family: verdana;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
       }
 
       #controls {
@@ -56,6 +59,10 @@
   </head>
   <body>
     <div id="controls">
+      <input type="radio" name="mode" value="select" checked="checked" id="mode-select" onclick="ggraph.set_mode('select')"> <label for="mode-select">Select</label>
+      &nbsp;
+      <input type="radio" name="mode" value="drag" id="mode-drag" onclick="ggraph.set_mode('drag')"> <label for="mode-drag">Drag</label>
+      |
       <input type="button" value="Merge" onclick="merge()" />
       <input type="button" value="Split" onclick="split()" />
       <input type="button" value="Remove" onclick="remove()" />
@@ -74,7 +81,7 @@
     var converted;
     var type = null;
 
-    ggraph.init('container');
+    ggraph.init('container', 25);
 
     var merge = function() {
       ggraph.merge(selection.all());
