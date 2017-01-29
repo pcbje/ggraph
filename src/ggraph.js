@@ -312,10 +312,6 @@ var ggraph = (function() {
 
           t.attr('x', text.width / -2 - padding_x / 2);
           t.attr('y', padding_y / 2);
-
-
-
-
         }
         else {
           groups.create_group(graph, d3.select(this), d, labels_container);
