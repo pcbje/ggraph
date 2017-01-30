@@ -157,6 +157,16 @@ describe("ggraph", function() {
     expect(selected).toEqual(2);
   });
 
+  it('removes mark on drag', function() {
+    marker.set([[0,0],[0,3],[3,3],[3,0]]);
+    selected = d3.select(container).selectAll('circle[name=selected]').size();
+    expect(selected).toEqual(2);
+    // drag
+    ggraph.drag.start({});
+    selected = d3.select(container).selectAll('circle[name=selected]').size();
+    expect(selected).toEqual(0);
+  });
+
   it('cluster', function() {
     var clusters = ggraph.cluster([
       {source: {id: 'a'}, target: {id: 'b'}},
@@ -226,5 +236,57 @@ describe("ggraph", function() {
     };
 
     expect(converted).toEqual(expected);
+  });
+
+  it('draws comments', function() {
+    graph = {
+      nodes: [
+        {id: 'a', x: 1, y: 1, members:[{'id': 'a', type:'comment'}]},
+        {id: 'b', x: 2, y: 2, members:[{'id': 'b', type:'x'}]}
+      ],
+      links: [
+        {source: {id: 'a'}, target: {id: 'b'}}
+      ],
+      all_links: {
+        'a': {'b': true},
+        'b': {'a': true}
+      },
+      member_map: {
+        'a': {type: 'comment', id: 'a', group: 'a'},
+        'b': {type: 'x', id: 'b', group: 'b'}
+      },
+      group_map: {
+        'a': 0,
+        'b': 1
+      }
+    }
+
+    graph.links.map(function(link) {
+      link.source.members = graph.nodes[graph.group_map[link.source.id]];
+      link.target.members = graph.nodes[graph.group_map[link.target.id]];
+    });
+
+    container = document.createElement('div');
+    ggraph.init(container);
+    ggraph.draw(graph, 1000);
+
+    var comments = [];
+    var links = []
+
+    d3.select(container).selectAll('.comment').each(function(d) {
+      comments.push(d);
+    });
+
+    d3.select(container).selectAll('line').each(function(link) {
+      links.push(link);
+    });
+
+    expect(comments).toEqual([{
+      id : 'a', x : 1, y : 1,
+      members : [ { id : 'a', type : 'comment' } ],
+      index : 0, vy : 0, vx : 0
+    }]);
+
+    expect(links.length).toEqual(1);
   })
 });

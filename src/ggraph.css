@@ -95,6 +95,10 @@ svg[name=filtered] line.rel {
   opacity: 0.3;
 }
 
+line[type=comment] {
+  stroke-dasharray: 2,2;
+}
+
 g[name=backbone] line.rel[name="filtered"] {
   stroke: #ddd;
 
@@ -140,4 +144,15 @@ text {
 
 circle[name=group-background] {
   fill: #F4F5F4;
+}
+
+.comment text {
+  font-size: 11px;
+  fill: #555;
+}
+
+.comment rect {
+  fill: #eee;
+  stroke: #aaa;
+  stroke-width: 1px;
 }

@@ -129,7 +129,6 @@ var ggraph = (function() {
       root = document.getElementById(root)
     }
     root.innerHTML = '';
-    root.addEventListener('contextmenu', function(e) {e.preventDefault()});
 
     var element = root.getBoundingClientRect();
     width = element.width;
@@ -187,8 +186,9 @@ var ggraph = (function() {
       }
 
       for (var member_id in graph.member_map) {
-
         var member = graph.member_map[member_id];
+        if (!member.circle) continue;
+
         if (selection.is_selected(member)) {
           continue
         }
@@ -208,23 +208,33 @@ var ggraph = (function() {
   };
 
   var charge = function(d) {
-    return -50;
+    if (d.members[0].type === 'comment') {
+      return -10 * Math.sqrt(d.members[0].id.length);
+    }
+    else {
+      return -50;
+    }
   };
 
   var link_strength = function(d) {
     if (d.filtered) return 0.01  / (d.source.members.length * d.target.members.length);
+    if (d.source.members && d.source.members[0] && d.source.members[0].type === 'comment') return 1 / d.source.members[0].id.length;
     return 1 / (d.source.members.length + d.target.members.length);
   };
 
+  var drag_start = function(d) {
+    started = true;
+    selection.clear();
+    clear_selected();
+    if (d3.event && !d3.event.active) {
+      simulation.alphaTarget(0.3).restart();
+    }
+    d.fx = d.x;
+    d.fy = d.y;
+  }
+
   var drag = d3.drag()
-    .on("start", function(d) {
-      started = true;
-      if (!d3.event.active) {
-        simulation.alphaTarget(0.3).restart();
-      }
-      d.fx = d.x;
-      d.fy = d.y;
-    })
+    .on("start", drag_start)
     .on("drag", function(d) {
       member_lines.clear();
       started = true;
@@ -261,6 +271,13 @@ var ggraph = (function() {
 
     link = container.append("g")
       .attr("class", "links").selectAll("line").data(graph.links).enter().append("line").attr('class', 'rel').attr("stroke-width", function(d, e) {
+        if (d.source.members && d.source.members[0] && d.source.members[0].type === 'comment') {
+            d3.select(this).attr('type', 'comment');
+        }
+        else if(graph.member_map[d.source] && graph.member_map[d.source].type === 'comment') {
+          d3.select(this).attr('type', 'comment');
+        }
+
         d3.select(this).attr('name', d.filtered ? 'filtered' : '')
         if (!d.value) d.value = 1;
         return Math.sqrt(d.value);
@@ -269,7 +286,36 @@ var ggraph = (function() {
     var start = new Date().getTime() / 1000;
     node = container.append("g")
       .attr("class", "nodes").selectAll("g").data(graph.nodes).enter().append('g').attr('class', 'node').call(drag).each(function(d) {
-        groups.create_group(graph, d3.select(this), d, labels_container);
+        if (d.members[0].type === 'comment') {
+          var padding_x = 8;
+          var padding_y = 4;
+
+          var box = d3.select(this).append('g');
+
+
+          box.attr('class', 'comment')
+
+          var bg = box.append('rect')
+
+          var t = box.append('text').text(d.members[0].id);
+
+          var text = t.node().getBBox();
+
+          bg.attr('width', text.width + padding_x)
+          bg.attr('height', text.height + padding_y);
+          bg.attr('fill', '#ccc')
+          bg.attr('rx', '2');
+          bg.attr('ry', '2');
+
+          bg.attr('y', text.height / -2 - padding_y);
+          bg.attr('x', text.width / -2 - padding_x);
+
+          t.attr('x', text.width / -2 - padding_x / 2);
+          t.attr('y', padding_y / 2);
+        }
+        else {
+          groups.create_group(graph, d3.select(this), d, labels_container);
+        }
       });
     var end = new Date().getTime() / 1000;
 
@@ -436,7 +482,10 @@ var ggraph = (function() {
       zoomer.on('zoom', zoom);
       svg.call(zoomer);
     }
+  }
 
+  var get_graph = function() {
+    return graph;
   }
 
   return {
@@ -447,12 +496,16 @@ var ggraph = (function() {
     merge: _merge,
     remove: _remove,
     merge_groups: _merge_groups,
+    get_graph: get_graph,
     split: split,
     convert: convert,
     ticked: ticked,
     clear_selected: clear_selected,
     cluster: cluster,
     filter_links: filter_links,
-    set_mode: set_mode
+    set_mode: set_mode,
+    drag: {
+      start: drag_start
+    }
   }
 })();

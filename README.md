@@ -74,8 +74,8 @@ ggraph.remove(['Maria West', 'Hazel Santiago']);
 ```bash
 git clone https://github.com/pcbje/ggraph && cd ggraph
 npm install
-node_modules/.bin/karma tests/cover.conf.js
-node_modules/.bin/karma tests/watch.conf.js
+node_modules/.bin/karma start tests/cover.conf.js
+node_modules/.bin/karma start tests/watch.conf.js
 node_modules/.bin/grunt min
 ```
 

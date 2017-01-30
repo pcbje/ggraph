@@ -69,6 +69,9 @@
       | <input type="button" value="Group singles" onclick="_singles()" />
       <input type="button" value="Backbone" onclick="_backbones()" />
       |
+      <input type="text" placeholder="Comment..." id="comment" />
+      <input type="button" value="Add comment" onclick="_set_comment()" />
+      |
       Nodes: <span id="node-count">0</span>
       Edges: <span id="edge-count">0</span>
     </div>
@@ -109,6 +112,56 @@
       var res = simmelian.filter(converted.all_links, 0.75);
       ggraph.filter_links(res);
     };
+
+    function _set_comment() {
+      if (selection.all().length === 0) return;
+      var comment = document.getElementById('comment').value;
+      var mock = ggraph.convert({
+        nodes: [{id: comment, type: 'comment'}],
+        links: []
+      });
+
+      var original = ggraph.get_graph();
+      var comment_obj = mock.nodes[0];
+
+      original.nodes.push(comment_obj);
+
+      for (var key in mock.member_map) {
+        original.member_map[key] = mock.member_map[key];
+      }
+
+      for (var key in mock.group_map) {
+        original.group_map[key] = original.nodes.length - 1;
+      }
+
+      document.getElementById('comment').value = '';
+
+      original.all_links[comment] = {}
+
+      var tx = 0;
+      var ty = 0;
+
+      selection.all().map(function(selected) {
+        var group_id = original.member_map[selected.id].group;
+        var target = original.nodes[original.group_map[group_id]];
+        tx += target.x;
+        ty += target.y;
+
+        original.all_links[comment][selected.id] = 1;
+        original.links.push({
+          source: comment_obj,
+          target: target,
+          value: 1
+        })
+      });
+
+      comment_obj.x = tx / selection.all().length;
+      comment_obj.y = ty / selection.all().length;
+
+      ggraph.draw(original);
+
+      selection.clear();
+    }
 
     ggraph.on_select(function(_all, _selected) {
       all = selection.all();
